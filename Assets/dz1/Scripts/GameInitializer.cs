@@ -3,7 +3,7 @@ using UnityEngine;
 public class GameInitializer : MonoBehaviour
 {
     [Header("Layer Masks")]
-    [SerializeField] private LayerMask _draggableLayer;
+    [SerializeField] private LayerMask _grabbableLayer;
     [SerializeField] private LayerMask _explodableLayer;
     [SerializeField] private LayerMask _groundLayer;
 
@@ -18,7 +18,7 @@ public class GameInitializer : MonoBehaviour
 
         GrabService grabService = new GrabService(
             raycastService,
-            _draggableLayer,
+            _grabbableLayer,
             _groundLayer);
 
         ExplosionService explosionService = new ExplosionService(

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ExplosionService
+public class ExplosionService : IExplodable
 {
     private readonly RaycastService _raycast;
     private readonly LayerMask _explodableLayer;
@@ -20,34 +20,22 @@ public class ExplosionService
         _explosionEffect = explosionEffect;
     }
 
-    public void TryCreateExplosion(Vector3 mousePosition)
+    public void ApplyExplosion(Vector3 mousePosition)
     {
-        if (!_raycast.TryGetRaycastHit(mousePosition, _groundLayer, out var groundHit))
-            return;
-
-        PlayExplosionEffect(groundHit.point);
-        ApplyExplosionForce(groundHit.point, _force, _radius);
-    }
-
-    private void PlayExplosionEffect(Vector3 position)
-    {
-        if (_explosionEffect == null)
-            return;
-
-        Object.Instantiate(_explosionEffect, position, Quaternion.identity);
-    }
-
-    private void ApplyExplosionForce(Vector3 center, float force, float radius)
-    {
-        Collider[] colliders = Physics.OverlapSphere(center, radius, _explodableLayer);
-
-        foreach (Collider collider in colliders)
+        if (_raycast.HasHit(mousePosition, out RaycastHit groundHit, _groundLayer))
         {
-            Rigidbody hitRigidbody = collider.GetComponent<Rigidbody>();
+            ParticleSystem explosion = Object.Instantiate(_explosionEffect, groundHit.point, Quaternion.identity);
 
-            if (hitRigidbody != null)
+            Collider[] colliders = Physics.OverlapSphere(groundHit.point, _radius, _explodableLayer);
+
+            foreach (Collider collider in colliders)
             {
-                hitRigidbody.AddExplosionForce(force, center, radius, _upwardsValue, ForceMode.Impulse);
+                Rigidbody hitRigidbody = collider.GetComponent<Rigidbody>();
+
+                if (hitRigidbody != null)
+                {
+                    hitRigidbody.AddExplosionForce(_force, groundHit.point, _radius, _upwardsValue, ForceMode.Impulse);
+                }
             }
         }
     }

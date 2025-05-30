@@ -23,22 +23,22 @@ public class InputController
     {
         if (Input.GetMouseButtonDown(_leftMouseButton))
         {
-            _grabService.TryStartDrag(Input.mousePosition);
+            _grabService.OnGrab(Input.mousePosition);
         }
 
         if (Input.GetMouseButton(_leftMouseButton))
         {
-            _grabService.UpdateDrag(Input.mousePosition);
+            _grabService.OnHold(Input.mousePosition);
         }
 
         if (Input.GetMouseButtonUp(_leftMouseButton))
         {
-            _grabService.EndDrag();
+            _grabService.OnRelease();
         }
 
         if (Input.GetMouseButtonDown(_rightMouseButton))
         {
-            _explosionService.TryCreateExplosion(Input.mousePosition);
+            _explosionService.ApplyExplosion(Input.mousePosition);
         }
     }
 }

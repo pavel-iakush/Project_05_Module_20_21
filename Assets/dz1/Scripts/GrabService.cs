@@ -1,52 +1,63 @@
 using UnityEngine;
 
-public class GrabService
+public class GrabService : IGrabbable
 {
     private readonly RaycastService _raycast;
-    private readonly LayerMask _draggableLayer;
+    private readonly LayerMask _grabbableLayer;
     private readonly LayerMask _groundLayer;
 
-    private IDraggable _currentDragged;
+    private Transform _currentGrabbed;
+    private Rigidbody _rigidbody;
     private Vector3 _dragOffset;
 
-    public GrabService(RaycastService raycast, LayerMask draggableLayer, LayerMask groundLayer)
+    private Vector3 _originalScale;
+    private float _grabbedScale = 1.1f;
+
+    public GrabService(RaycastService raycast, LayerMask grabbableLayer, LayerMask groundLayer)
     {
         _raycast = raycast;
-        _draggableLayer = draggableLayer;
+        _grabbableLayer = grabbableLayer;
         _groundLayer = groundLayer;
     }
 
-    public void TryStartDrag(Vector3 mousePosition)
+    public void OnGrab(Vector3 mousePosition)
     {
-        if (_raycast.TryGetRaycastHit(mousePosition, _draggableLayer, out RaycastHit hit))
+        if (_raycast.HasHit(mousePosition, out RaycastHit hit, _grabbableLayer))
         {
-            IDraggable draggable = hit.collider.GetComponent<IDraggable>();
-            if (draggable != null)
-            {
-                _currentDragged = draggable;
-                draggable.OnGrab();
+            _currentGrabbed = hit.transform;
+            _rigidbody = _currentGrabbed.GetComponent<Rigidbody>();
+            _originalScale = _currentGrabbed.localScale;
 
-                if (_raycast.TryGetRaycastHit(mousePosition, _groundLayer, out RaycastHit groundHit))
-                {
-                    _dragOffset = hit.transform.position - groundHit.point;
-                }
+            if (_raycast.HasHit(mousePosition, out RaycastHit groundHit, _groundLayer))
+            {
+                _rigidbody.isKinematic = true;
+                _currentGrabbed.localScale = _originalScale * _grabbedScale;
+
+                _dragOffset = _currentGrabbed.position - groundHit.point;
             }
         }
     }
 
-    public void UpdateDrag(Vector3 mousePosition)
+    public void OnHold(Vector3 mousePosition)
     {
-        if (_currentDragged == null) return;
+        if (_currentGrabbed == null)
+            return;
 
-        if (_raycast.TryGetRaycastHit(mousePosition, _groundLayer, out RaycastHit groundHit))
+        if (_raycast.HasHit(mousePosition, out RaycastHit hit, _groundLayer))
         {
-            ((MonoBehaviour)_currentDragged).transform.position = groundHit.point + _dragOffset;
+            _currentGrabbed.position = hit.point + _dragOffset;
         }
     }
 
-    public void EndDrag()
+    public void OnRelease()
     {
-        _currentDragged?.OnRelease();
-        _currentDragged = null;
+        if (_rigidbody == null)
+            return;
+
+        _rigidbody.isKinematic = false;
+        _currentGrabbed.localScale = _originalScale;
+
+        _currentGrabbed = null;
+        _rigidbody = null;
     }
 }

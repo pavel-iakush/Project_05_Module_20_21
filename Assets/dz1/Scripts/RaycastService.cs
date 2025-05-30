@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class RaycastService
 {
-    public bool TryGetRaycastHit(Vector3 mousePosition, LayerMask layerMask, out RaycastHit hit)
+    public bool HasHit(Vector3 mousePosition, out RaycastHit hit, LayerMask layerMask)
     {
         Ray ray = Camera.main.ScreenPointToRay(mousePosition);
         return Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask);
