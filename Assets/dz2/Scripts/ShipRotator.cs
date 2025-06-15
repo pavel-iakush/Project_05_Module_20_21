@@ -35,10 +35,4 @@ public class ShipRotator : MonoBehaviour
 
         _shipDirection = transform.TransformDirection(Vector3.forward);
     }
-
-    //private void OnDrawGizmos()
-    //{
-    //    Gizmos.color = Color.red;
-    //    Gizmos.DrawRay(transform.position, _shipDirection * 5f);
-    //}
 }

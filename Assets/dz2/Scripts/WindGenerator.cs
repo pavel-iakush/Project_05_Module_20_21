@@ -31,10 +31,4 @@ public class WindGenerator : MonoBehaviour
 
         _windDirection = Quaternion.Euler(0.0f, randomAngle, 0.0f) * Vector3.forward;
     }
-
-    //private void OnDrawGizmos()
-    //{
-    //    Gizmos.color = Color.cyan;
-    //    Gizmos.DrawRay(transform.position, _windDirection * 5f);
-    //}
 }

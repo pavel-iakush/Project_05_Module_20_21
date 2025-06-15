@@ -17,7 +17,7 @@ public class ShipMovement : MonoBehaviour
     private void Update()
     {
         float sailAling = Vector3.Dot(_windGenerator.WindDirection, _sailRotator.SailDirection);
-        float shipAlign = Vector3.Dot(_windGenerator.WindDirection, _shipRotator.ShipDirection);
+        float shipAlign = Vector3.Dot(_sailRotator.SailDirection, _shipRotator.ShipDirection);
 
         if (sailAling > _deadZone)
         {

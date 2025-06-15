@@ -41,10 +41,4 @@ public class SailRotator : MonoBehaviour
 
         _sailDirection = transform.TransformDirection(Vector3.forward);
     }
-
-    //private void OnDrawGizmos()
-    //{
-    //    Gizmos.color = Color.green;
-    //    Gizmos.DrawRay(transform.position, _sailDirection * 5f);
-    //}
 }
