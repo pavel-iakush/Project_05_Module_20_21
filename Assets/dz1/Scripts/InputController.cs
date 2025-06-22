@@ -1,44 +1,68 @@
 using UnityEngine;
 
-public class InputController
+namespace Refactoring
 {
-    private readonly GrabService _grabService;
-    private readonly ExplosionService _explosionService;
-
-    private int _leftMouseButton = 0;
-    private int _rightMouseButton = 1;
-
-    public InputController(GrabService grabService, ExplosionService explosionService)
+    public class InputController : MonoBehaviour
     {
-        _grabService = grabService;
-        _explosionService = explosionService;
-    }
+        [SerializeField] private LayerMask _grabLayer;
+        [SerializeField] private LayerMask _explosionLayer;
+        [SerializeField] private ParticleSystem _explosionEffect;
 
-    public void Update()
-    {
-        HandleMouseInput();
-    }
+        private GrabService _grabService;
+        private ExplosionService _explosionService;
+        private RaycastService _raycastService;
 
-    private void HandleMouseInput()
-    {
-        if (Input.GetMouseButtonDown(_leftMouseButton))
+        private float _initialGrabHeight;
+
+        private void Awake()
         {
-            _grabService.OnGrab(Input.mousePosition);
+            _grabService = new GrabService();
+            _explosionService = new ExplosionService(_explosionEffect);
+            _raycastService = new RaycastService();
         }
 
-        if (Input.GetMouseButton(_leftMouseButton))
+        private void Update()
         {
-            _grabService.OnHold(Input.mousePosition);
+            ProcessGrab();
+            ProcessExplosion();
         }
 
-        if (Input.GetMouseButtonUp(_leftMouseButton))
+        private void ProcessGrab()
         {
-            _grabService.OnRelease();
+            if (Input.GetMouseButtonDown(0))
+            {
+                if (_raycastService.HasHit(Input.mousePosition, _grabLayer, out RaycastHit hit))
+                {
+                    _initialGrabHeight = hit.point.y;
+                    Vector3 grabPosition = new Vector3(hit.point.x, _initialGrabHeight, hit.point.z);
+
+                    _grabService.TryGrabFromHit(hit);
+                    _grabService.UpdatePosition(grabPosition);
+                }
+            }
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                _grabService.ReleaseCurrent();
+            }
+
+            if (Input.GetMouseButton(0))
+            {
+                if (_raycastService.HasHit(Input.mousePosition, _grabLayer, out RaycastHit hit))
+                {
+                    Vector3 newPosition = new Vector3(hit.point.x, _initialGrabHeight, hit.point.z);
+                    _grabService.UpdatePosition(newPosition);
+                }
+            }
         }
 
-        if (Input.GetMouseButtonDown(_rightMouseButton))
+        private void ProcessExplosion()
         {
-            _explosionService.ApplyExplosion(Input.mousePosition);
+            if (Input.GetMouseButtonDown(1))
+            {
+                if (_raycastService.HasHit(Input.mousePosition, _explosionLayer, out RaycastHit hit))
+                    _explosionService.CreateExplosionAtPoint(hit.point, 10f, 5f);
+            }
         }
     }
 }

@@ -1,6 +1,9 @@
 using UnityEngine;
 
-public interface IExplodable
+namespace Refactoring
 {
-    void ApplyExplosion(Vector3 mousePosition);
+    public interface IExplodable
+    {
+        void ApplyExplosion(Vector3 mousePosition, float force, float radius);
+    }
 }

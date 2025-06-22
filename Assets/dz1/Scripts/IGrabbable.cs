@@ -1,8 +1,11 @@
 using UnityEngine;
 
-public interface IGrabbable
+namespace Refactoring
 {
-    void OnGrab(Vector3 mousePosition);
-    void OnHold(Vector3 mousePosition);
-    void OnRelease();
+    public interface IGrabbable
+    {
+        void OnGrab();
+
+        void OnRelease();
+    }
 }

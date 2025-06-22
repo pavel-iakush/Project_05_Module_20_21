@@ -1,41 +1,28 @@
-using UnityEngine;
+﻿using UnityEngine;
 
-public class ExplosionService : IExplodable
+namespace Refactoring
 {
-    private readonly RaycastService _raycast;
-    private readonly LayerMask _explodableLayer;
-    private readonly LayerMask _groundLayer;
-    private readonly ParticleSystem _explosionEffect;
-
-    private float _upwardsValue = 0.1f;
-    private float _force = 10.0f;
-    private float _radius = 5.0f;
-
-    public ExplosionService(RaycastService raycast, LayerMask explodableLayer,
-                         LayerMask groundLayer, ParticleSystem explosionEffect)
+    public class ExplosionService
     {
-        _raycast = raycast;
-        _explodableLayer = explodableLayer;
-        _groundLayer = groundLayer;
-        _explosionEffect = explosionEffect;
-    }
+        private readonly ParticleSystem _explosionEffect;
 
-    public void ApplyExplosion(Vector3 mousePosition)
-    {
-        if (_raycast.HasHit(mousePosition, out RaycastHit groundHit, _groundLayer))
+        public ExplosionService(ParticleSystem explosionEffect)
         {
-            ParticleSystem explosion = Object.Instantiate(_explosionEffect, groundHit.point, Quaternion.identity);
+            _explosionEffect = explosionEffect;
+        }
 
-            Collider[] colliders = Physics.OverlapSphere(groundHit.point, _radius, _explodableLayer);
+        public void CreateExplosionAtPoint(Vector3 point, float force, float radius)
+        {
+            Object.Instantiate(_explosionEffect, point, Quaternion.identity);
+
+            Collider[] colliders = Physics.OverlapSphere(point, radius);
 
             foreach (Collider collider in colliders)
             {
-                Rigidbody hitRigidbody = collider.GetComponent<Rigidbody>();
+                IExplodable explodable = collider.GetComponent<IExplodable>();
 
-                if (hitRigidbody != null)
-                {
-                    hitRigidbody.AddExplosionForce(_force, groundHit.point, _radius, _upwardsValue, ForceMode.Impulse);
-                }
+                if (explodable != null)
+                    explodable.ApplyExplosion(point, force, radius);
             }
         }
     }

@@ -1,10 +1,13 @@
 using UnityEngine;
 
-public class RaycastService
+namespace Refactoring
 {
-    public bool HasHit(Vector3 mousePosition, out RaycastHit hit, LayerMask layerMask)
+    public class RaycastService
     {
-        Ray ray = Camera.main.ScreenPointToRay(mousePosition);
-        return Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask);
+        public bool HasHit(Vector3 position, LayerMask layerMask, out RaycastHit hit)
+        {
+            Ray ray = Camera.main.ScreenPointToRay(position);
+            return Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask);
+        }
     }
 }
