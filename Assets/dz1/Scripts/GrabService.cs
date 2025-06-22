@@ -1,30 +1,33 @@
-﻿using UnityEngine;
+﻿using Unity.Burst.CompilerServices;
+using UnityEngine;
 
 namespace Refactoring
 {
     public class GrabService
     {
         private IGrabbable _currentGrabbable;
+
         private Transform _currentTransform;
+        private Vector3 _dragOffset;
 
-        public bool TryGrabFromHit(RaycastHit hit)
+        public void GrabCurrent(RaycastHit hit)
         {
-            IGrabbable grabbable = hit.collider.GetComponent<IGrabbable>();
+            _currentGrabbable = hit.collider.GetComponent<IGrabbable>();
+            _currentGrabbable.OnGrab();
 
-            if (grabbable != null)
-            {
-                GrabCurrent(grabbable, hit.transform);
-                return true;
-            }
-
-            return false;
+            _currentTransform = hit.transform;
+            _dragOffset = _currentTransform.position - hit.point;
         }
 
-        public void GrabCurrent(IGrabbable grabbable, Transform objectTransform)
+        public void HoldCurrent(RaycastHit hit)
         {
-            _currentGrabbable = grabbable;
-            _currentTransform = objectTransform;
-            _currentGrabbable.OnGrab();
+            if (_currentGrabbable == null)
+                return;
+            
+            if (_currentTransform != null)
+            {               
+                _currentTransform.position = hit.point + _dragOffset;
+            }    
         }
 
         public void ReleaseCurrent()
@@ -32,15 +35,10 @@ namespace Refactoring
             if (_currentGrabbable != null)
             {
                 _currentGrabbable.OnRelease();
+
                 _currentGrabbable = null;
                 _currentTransform = null;
             }
-        }
-
-        public void UpdatePosition(Vector3 position)
-        {
-            if (_currentTransform != null)
-                _currentTransform.position = position;
         }
     }
 }

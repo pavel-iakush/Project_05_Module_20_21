@@ -449,10 +449,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1dd691b47a96ca4d9e12c43c1eb3416, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _grabLayer:
+  _grabbableLayer:
     serializedVersion: 2
     m_Bits: 128
-  _explosionLayer:
+  _groundLayer:
     serializedVersion: 2
     m_Bits: 64
   _explosionEffect: {fileID: 2868216338370173421, guid: 83ad694f134ab954580473212156b35a,
