@@ -11,12 +11,21 @@ namespace Refactoring
         private GrabService _grabService;
         private ExplosionService _explosionService;
         private RaycastService _raycastService;
+
+        private int _leftMouseButton = 0;
+        private int _rightMouseButton = 1;
+
+        private float _force = 10f;
+        private float _radius = 4f;
+
+        private RaycastHit _groundHit;
+        private RaycastHit _objectHit;
         
         private void Awake()
         {
             _grabService = new GrabService();
             _explosionService = new ExplosionService(_explosionEffect);
-            _raycastService = new RaycastService();
+            _raycastService = new RaycastService(Camera.main);
         }
 
         private void Update()
@@ -27,38 +36,23 @@ namespace Refactoring
 
         private void ProcessGrab()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(_leftMouseButton) && _raycastService.HasHit(Input.mousePosition, _grabbableLayer, out _objectHit))
             {
-                if (_raycastService.HasHit(Input.mousePosition, _grabbableLayer, out RaycastHit hit))
-                {
-                    _grabService.GrabCurrent(hit);
-                    Debug.Log("grab");
-                }
+                _raycastService.HasHit(Input.mousePosition, _groundLayer, out _groundHit);
+                _grabService.GrabCurrent(_objectHit, _groundHit);
             }
 
-            if (Input.GetMouseButton(0))
-            {
-                if (_raycastService.HasHit(Input.mousePosition, _groundLayer, out RaycastHit hit))
-                {
-                    _grabService.HoldCurrent(hit);
-                    Debug.Log("hold");
-                }
-            }
+            if (Input.GetMouseButton(_leftMouseButton) && _raycastService.HasHit(Input.mousePosition, _groundLayer, out _groundHit))
+                _grabService.HoldCurrent(_groundHit);
 
-            if (Input.GetMouseButtonUp(0))
-            {
+            if (Input.GetMouseButtonUp(_leftMouseButton))
                 _grabService.ReleaseCurrent();
-                Debug.Log("release");
-            }
         }
 
         private void ProcessExplosion()
         {
-            if (Input.GetMouseButtonDown(1))
-            {
-                if (_raycastService.HasHit(Input.mousePosition, _groundLayer, out RaycastHit hit))
-                    _explosionService.CreateExplosionAtPoint(hit.point, 10f, 5f);
-            }
+            if (Input.GetMouseButtonDown(_rightMouseButton) && _raycastService.HasHit(Input.mousePosition, _groundLayer, out _groundHit))
+                _explosionService.CreateExplosionAtPoint(_groundHit.point, _force, _radius);
         }
     }
 }
