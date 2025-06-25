@@ -1,3 +1,4 @@
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 
 namespace Refactoring
@@ -19,7 +20,6 @@ namespace Refactoring
         private float _radius = 4f;
 
         private RaycastHit _groundHit;
-        private RaycastHit _objectHit;
         
         private void Awake()
         {
@@ -36,14 +36,14 @@ namespace Refactoring
 
         private void ProcessGrab()
         {
-            if (Input.GetMouseButtonDown(_leftMouseButton) && _raycastService.HasHit(Input.mousePosition, _grabbableLayer, out _objectHit))
+            if (Input.GetMouseButtonDown(_leftMouseButton) && IsObjectClicked(out RaycastHit objectHit))
             {
                 _raycastService.HasHit(Input.mousePosition, _groundLayer, out _groundHit);
-                _grabService.GrabCurrent(_objectHit, _groundHit);
+                _grabService.GrabCurrent(objectHit, _groundHit);
             }
 
-            if (Input.GetMouseButton(_leftMouseButton) && _raycastService.HasHit(Input.mousePosition, _groundLayer, out _groundHit))
-                _grabService.HoldCurrent(_groundHit);
+            if (Input.GetMouseButton(_leftMouseButton) && IsGroundClicked(out RaycastHit groundHit))
+                _grabService.HoldCurrent(groundHit);
 
             if (Input.GetMouseButtonUp(_leftMouseButton))
                 _grabService.ReleaseCurrent();
@@ -51,8 +51,18 @@ namespace Refactoring
 
         private void ProcessExplosion()
         {
-            if (Input.GetMouseButtonDown(_rightMouseButton) && _raycastService.HasHit(Input.mousePosition, _groundLayer, out _groundHit))
-                _explosionService.CreateExplosionAtPoint(_groundHit.point, _force, _radius);
+            if (Input.GetMouseButtonDown(_rightMouseButton) && IsGroundClicked(out RaycastHit groundHit))
+                _explosionService.CreateExplosionAtPoint(groundHit.point, _force, _radius);
+        }
+
+        private bool IsObjectClicked(out RaycastHit objectHit)
+        {
+            return _raycastService.HasHit(Input.mousePosition, _grabbableLayer, out objectHit);
+        }
+
+        private bool IsGroundClicked(out RaycastHit groundHit)
+        {
+            return _raycastService.HasHit(Input.mousePosition, _groundLayer, out groundHit);
         }
     }
 }

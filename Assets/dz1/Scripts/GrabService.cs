@@ -9,7 +9,7 @@ namespace Refactoring
         private IGrabbable _currentGrabbable;
 
         private Transform _currentTransform;
-        private Vector3 _liftUp = new Vector3(0f, 0.75f, 0f);
+        //private Vector3 _liftUp = new Vector3(0f, 0.75f, 0f);
         private Vector3 _dragOffset;
 
         public void GrabCurrent(RaycastHit objectHit, RaycastHit groundHit)
