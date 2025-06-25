@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Refactoring
 {
-    public class InputController : MonoBehaviour
+    public class MouseController : MonoBehaviour, IInput
     {
         [SerializeField] private LayerMask _grabbableLayer;
         [SerializeField] private LayerMask _groundLayer;
@@ -37,7 +37,7 @@ namespace Refactoring
             ProcessExplosion();
         }
 
-        private void ProcessGrab()
+        public void ProcessGrab()
         {
             Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
 
@@ -54,7 +54,7 @@ namespace Refactoring
                 _grabService.ReleaseCurrent();
         }
 
-        private void ProcessExplosion()
+        public void ProcessExplosion()
         {
             if (Input.GetMouseButtonDown(_rightMouseButton) && IsGroundClicked(out RaycastHit groundHit))
                 _explosionService.CreateExplosionAtPoint(groundHit.point, _force, _radius);
