@@ -20,12 +20,15 @@ namespace Refactoring
         private float _radius = 4f;
 
         private RaycastHit _groundHit;
+        private Camera _camera;
         
         private void Awake()
         {
             _grabService = new GrabService();
             _explosionService = new ExplosionService(_explosionEffect);
-            _raycastService = new RaycastService(Camera.main);
+            _raycastService = new RaycastService();
+
+            _camera = Camera.main;
         }
 
         private void Update()
@@ -36,9 +39,11 @@ namespace Refactoring
 
         private void ProcessGrab()
         {
+            Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
+
             if (Input.GetMouseButtonDown(_leftMouseButton) && IsObjectClicked(out RaycastHit objectHit))
             {
-                _raycastService.HasHit(Input.mousePosition, _groundLayer, out _groundHit);
+                _raycastService.HasHit(ray.origin, ray.direction, _groundLayer, out _groundHit);
                 _grabService.GrabCurrent(objectHit, _groundHit);
             }
 
@@ -57,12 +62,16 @@ namespace Refactoring
 
         private bool IsObjectClicked(out RaycastHit objectHit)
         {
-            return _raycastService.HasHit(Input.mousePosition, _grabbableLayer, out objectHit);
+            Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
+
+            return _raycastService.HasHit(ray.origin, ray.direction, _grabbableLayer, out objectHit);
         }
 
         private bool IsGroundClicked(out RaycastHit groundHit)
         {
-            return _raycastService.HasHit(Input.mousePosition, _groundLayer, out groundHit);
+            Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
+
+            return _raycastService.HasHit(ray.origin, ray.direction, _groundLayer, out groundHit);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Refactoring
         public void OnGrab()
         {
             _rigidbody.isKinematic = true;
-
+            
             _originalScale = gameObject.transform.localScale;
             gameObject.transform.localScale *= _grabbedScale;
         }
@@ -26,7 +26,7 @@ namespace Refactoring
         public void OnRelease()
         {
             _rigidbody.isKinematic = false;
-
+            
             gameObject.transform.localScale = _originalScale;
         }
 
